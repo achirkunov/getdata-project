@@ -1,30 +1,50 @@
 library(plyr)
 
+# Quick check if we have downloaded the files
+dataDirectory <- "UCI HAR Dataset"
+if(!file.exists(dataDirectory)) {
+  stop(c("Please put the files into the following directory: ",getwd(),"/",dataDirectory))
+}
+
+
+
 activityLabels <- read.table('UCI HAR Dataset/activity_labels.txt', header= FALSE, col.names=c("ID","Description"))
 
-subjectsColumn <- read.table('UCI HAR Dataset/train/subject_train.txt', header=FALSE)
-activitiesColumn <- read.table('UCI HAR Dataset/train/y_train.txt', header=FALSE)
-#measurementsColumn <- read.table('UCI HAR Dataset/train/X_train.txt', header=FALSE)
-features <- read.table('UCI HAR Dataset/features.txt', header=FALSE)
+## Read and merge the subject and activities
+subjects <- rbind(
+  read.table(paste(dataDirectory,'/train/subject_train.txt',sep=""), header=FALSE),
+  read.table(paste(dataDirectory,'/test/subject_test.txt',sep=""), header=FALSE)
+)
 
+activities <- rbind(
+  read.table(paste(dataDirectory,'/train/y_train.txt',sep=""), header=FALSE),
+  read.table(paste(dataDirectory,'/test/y_test.txt',sep=""), header=FALSE)
+)
 
-#filteredFeatures <- features$V2[grepl("mean()",features$V2) | grepl("std()",features$V2)]
+# Read and merge the measurements, with only the features we need
+features <- read.table(paste(dataDirectory,"/features.txt",sep=""),
+                       header=FALSE,
+                       col.names=c("ID","Name"))
 
+# We create a logical vector with variables that contain either mean() or std()
+colClasses <- grepl("mean\\(\\)",features$Name) | grepl("std\\(\\)",features$Name)
 
-# We take the features we need and search only for mean() or std()
-colClasses <- grepl("mean\\(\\)",features$V2) | grepl("std\\(\\)",features$V2)
-# that's the column names
-filteredFeatures <- features$V2[colClasses]
-# now we construct a vector of NA or NULL to filter
+# We get the features that we want
+filteredFeatures <- features$Name[colClasses]
+
+# Construct colClasses with NULL where we want to skip the columns
 colClasses[colClasses == TRUE] <- NA
 colClasses[colClasses == FALSE] <- "NULL"
 
-measurements <- read.table('UCI HAR Dataset/train/X_train.txt',
-                           header = FALSE,
-                           colClasses = colClasses)
+# Read & merge the datasets
+measurements <- rbind(
+  read.table(paste(dataDirectory,'/train/X_train.txt',sep=""),header=FALSE,colClasses = colClasses),
+  read.table(paste(dataDirectory,'/test/X_test.txt',sep=""),header=FALSE,colClasses = colClasses)
+)
+
 colnames(measurements) <- filteredFeatures
-measurements <- cbind(activity = activitiesColumn$V1, measurements)
-measurements <- cbind(subject = subjectsColumn$V1, measurements)
+measurements <- cbind(activity = activities$V1, measurements)
+measurements <- cbind(subject = subjects$V1, measurements)
 # replace stuff
 measurements$activity <- activityLabels$Description[measurements$activity]
 
