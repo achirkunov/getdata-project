@@ -1,7 +1,10 @@
 
 # Variables
-subject | 
-activity | WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING
+subject
+
+activity
+⋅⋅⋅WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING
+
 tbodyaccmeanx
 tbodyaccmeany
 tbodyaccmeanz
