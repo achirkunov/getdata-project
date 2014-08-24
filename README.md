@@ -5,8 +5,11 @@
 * the data files have to downloaded in the "UCI HAR Dataset" folder
 
 ## Instruction
-Run run_analysis.R which will output a tidy dataset in tidy.txt 
+* Run run_analysis.R which will output a tidy dataset in tidy.txt 
 
 ## Description of the data cleanup
-We merge both the train & test dataset replace activity IDs by description, and only import measurements of means and standard deviation (if the column contains a mean() or std()).
-Multiple measurements of a subject/activity pair are averaged.
+* activity_labels.txt is used to transform activity IDs from y_train.txt/y_test.txt into activity description
+* subject_train.txt & subject_test.txt are merged together through rbind
+* features.txt is read and we filter only the values that contain either mean() or std(). Features names are then lower-cased and any special character removed
+* X_train.txt/X_test is then read and we take only the columns we need from last step
+* At the end, we average multiple measurments over every subject/activity pair
