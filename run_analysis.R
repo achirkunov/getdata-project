@@ -31,6 +31,7 @@ colClasses <- grepl("mean\\(\\)",features$Name) | grepl("std\\(\\)",features$Nam
 
 # We get the features that we want
 filteredFeatures <- features$Name[colClasses]
+filteredFeatures <- tolower(gsub("-|\\()","",filteredFeatures))
 
 # Construct colClasses with NULL where we want to skip the columns
 colClasses[colClasses == TRUE] <- NA
@@ -50,6 +51,4 @@ measurements$activity <- activityLabels$Description[measurements$activity]
 
 output <- ddply(measurements, .(subject,activity), numcolwise(mean))
 
-#tidy <- subjectsColumn
-#tidy <- cbind(activitiesColumn$V1, tidy)
-##colnames(tidy) <- filteredFeatures$V2
+write.table(output, file = "tidy.txt", row.names = FALSE)
